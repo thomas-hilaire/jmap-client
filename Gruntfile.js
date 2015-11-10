@@ -85,50 +85,25 @@ module.exports = function(grunt) {
           mask: '**/*.js',
           root: 'dist/'
         }
-      },
-      istanbul_check_coverage: {
-        default: {
-          options: {
-            coverageFolder: 'coverage-*', // will check both coverage folders and merge the coverage results
-            check: {
-              lines: 80,
-              statements: 80
-            }
-          }
-        }
       }
     },
-    coveralls: {
-      // Options relevant to all targets
-      options: {
-        // When true, grunt-coveralls will only print a warning rather than
-        // an error, to prevent CI builds from failing unnecessarily (e.g. if
-        // coveralls.io is down). Optional, defaults to false.
-        force: false
-      },
 
+    lcovMerge: {
+      options: {
+        emitters: ['file'],
+        outputFile: 'coverage-all/all.info'
+      },
+      src: [
+        'coverage-front/*.info',
+        'coverage-back/*.info'
+      ]
+    },
+
+    coveralls: {
       publish: {
-        // LCOV coverage file (can be string, glob or array)
-        src: [
-          'coverage-front/*.info',
-          'coverage-back/*.info'
-        ],
-        options: {
-          // Any options for just this target
-        }
+        src: 'coverage-all/all.info'
       },
     },
-    //
-    // lcovMerge: {
-    //   options: {
-    //     emitters: ['event', 'file'],
-    //     outputFile: 'mergeLcov.info'
-    //   },
-    //   src: [
-    //     'coverage-front/*.info',
-    //     'coverage-back/*.info'
-    //   ]
-    // },
 
     watch: {
       files: ['<%= jshint.all.src %>'],
@@ -228,7 +203,7 @@ module.exports = function(grunt) {
   grunt.registerTask('compile', 'Compile from ES6 to ES5', ['clean:dist', 'browserify', 'uglify']);
   grunt.registerTask('dist', ['test']);
   grunt.registerTask('linters', 'Check code for lint', ['jshint:all', 'jscs:lint', 'lint_pattern:all']);
-  grunt.registerTask('test', 'Lint, compile and launch test suite', ['linters', 'compile', 'mocha_istanbul:coverage', 'karma', 'coveralls:publish']);
+  grunt.registerTask('test', 'Lint, compile and launch test suite', ['linters', 'compile', 'mocha_istanbul:coverage', 'karma', 'lcovMerge', 'coveralls:publish']);
   grunt.registerTask('dev', 'Launch tests then for each changes relaunch it', ['test', 'watch']);
   grunt.registerTask('apidoc', 'Generates API documentation', ['clean:apidoc', 'jsdoc']);
 
