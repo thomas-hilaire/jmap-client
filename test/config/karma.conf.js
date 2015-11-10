@@ -10,7 +10,7 @@ module.exports = function(config) {
     reporters: ['spec', 'coverage'],
 
     coverageReporter: {
-      dir: 'coverage/frontend',
+      dir: 'coverage-front',
       reporters: [
         { type: 'lcov', subdir: '.' }
       ]
